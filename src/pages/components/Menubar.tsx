@@ -11,18 +11,7 @@ import {
 } from "@fluentui/react-icons";
 import { createPatient } from "@/lib/dcm4che";
 import { Patient } from "@/lib/types";
-
-async function createPatientHandler() {
-  const patient: Patient = {
-    name: "Martin Nyirenda",
-    DOB: "12-01-2020",
-    imagingDay: "12-06-2023",
-    sex: "M",
-    ID: "45333",
-  };
-  const res = await createPatient(patient);
-  console.log(res);
-}
+import CreatePatientForm from "./CreatePatientForm";
 
 export const MenuToolBar = (props: Partial<ToolbarProps>) => (
   <Toolbar
@@ -34,18 +23,7 @@ export const MenuToolBar = (props: Partial<ToolbarProps>) => (
       borderRadius: "8px",
     }}
   >
-    <ToolbarButton
-      aria-label="Increase Font Size"
-      appearance="primary"
-      icon={<FontIncrease24Regular />}
-      onClick={() => {
-        createPatientHandler();
-      }}
-    />
-    <ToolbarButton
-      aria-label="Decrease Font Size"
-      icon={<FontDecrease24Regular />}
-    />
+    <CreatePatientForm />
     <ToolbarButton aria-label="Reset Font Size" icon={<TextFont24Regular />} />
   </Toolbar>
 );

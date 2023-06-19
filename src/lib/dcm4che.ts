@@ -1,5 +1,13 @@
 import { db } from "@/lib/firebase";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  doc,
+  setDoc,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
 import { Patient } from "./types";
 
 async function postData(url = "", data = {}) {
@@ -48,6 +56,7 @@ export async function createPatient(patient: Patient) {
         name: patient.name,
         DOB: patient.DOB,
         imagingDay: patient.imagingDay,
+        createdAt: Date.now().toLocaleString(),
         sex: patient.sex,
       }).then(() => (final = "success"));
     })
@@ -57,6 +66,28 @@ export async function createPatient(patient: Patient) {
     });
 
   return final;
+}
+
+export async function getLastPatientId(
+  collectionName: string
+): Promise<Number> {
+  try {
+    const collectionRef = collection(db, collectionName);
+    const q = query(collectionRef, orderBy("name", "desc"), limit(1));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      const lastItem = querySnapshot.docs[0];
+      const lastItemId = lastItem.id;
+      const lastItemIdNumber = parseInt(lastItemId) + 1;
+      return lastItemIdNumber;
+    } else {
+      return 0;
+    }
+  } catch (error) {
+    console.error("Error getting last item:", error);
+    throw error;
+  }
 }
 
 export async function GetPatients(num?: Number): Promise<Patient[]> {

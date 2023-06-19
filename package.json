@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@fluentui/react-components": "^9.21.0",
+    "@fluentui/react-datepicker-compat": "^0.1.5",
     "@types/node": "20.2.5",
     "@types/react": "18.2.8",
     "@types/react-dom": "18.2.4",
