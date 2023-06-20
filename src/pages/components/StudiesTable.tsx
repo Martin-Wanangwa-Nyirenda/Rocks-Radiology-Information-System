@@ -19,54 +19,52 @@ import {
   DocumentPdfRegular,
   VideoRegular,
 } from "@fluentui/react-icons";
-
-const items = [
-  {
-    file: { label: "Meeting notes", icon: <DocumentRegular /> },
-    author: { label: "Max SMustermann", status: "available" },
-    lastUpdated: { label: "7h ago", timestamp: 1 },
-    lastUpdate: {
-      label: "You edited this",
-      icon: <EditRegular />,
-    },
-  },
-  {
-    file: { label: "Thursday presentation", icon: <FolderRegular /> },
-    author: { label: "Erika SMustermann", status: "busy" },
-    lastUpdated: { label: "Yesterday at 1:45 PM", timestamp: 2 },
-    lastUpdate: {
-      label: "You recently opened this",
-      icon: <OpenRegular />,
-    },
-  },
-  {
-    file: { label: "Training recording", icon: <VideoRegular /> },
-    author: { label: "John SDoe", status: "away" },
-    lastUpdated: { label: "Yesterday at 1:45 PM", timestamp: 2 },
-    lastUpdate: {
-      label: "You recently opened this",
-      icon: <OpenRegular />,
-    },
-  },
-  {
-    file: { label: "Purchase order", icon: <DocumentPdfRegular /> },
-    author: { label: "Jane SDoe", status: "offline" },
-    lastUpdated: { label: "Tue at 9:30 AM", timestamp: 3 },
-    lastUpdate: {
-      label: "You shared this in a Teams chat",
-      icon: <PeopleRegular />,
-    },
-  },
-];
+import { Study } from "@/lib/types";
+import { GetStudies } from "@/lib/dcm4che";
 
 const columns = [
-  { columnKey: "file", label: "File" },
-  { columnKey: "author", label: "Author" },
-  { columnKey: "lastUpdated", label: "Last updated" },
-  { columnKey: "lastUpdate", label: "Last update" },
+  { columnKey: "studyID", label: "Study ID" },
+  { columnKey: "patientName", label: "Patient Name" },
+  { columnKey: "studyDate", label: "Study Date" },
+  { columnKey: "studyTime", label: "Study Time" },
+  { columnKey: "studyUID", label: "Study UID" },
+  { columnKey: "refPhys", label: "Refering Physician" },
 ];
 
 const StudiesTable = () => {
+  const [data, setData] = React.useState<
+    Array<{
+      patient_id: { label: string };
+      patient_name: { label: string };
+      study_id: { label: string };
+      study_uid: { label: string };
+      study_date: { label: string };
+      study_time: { label: string };
+      refering_phys: { label: string };
+    }>
+  >([]);
+  React.useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const patients = await GetStudies();
+        const items = patients.map((item: Study) => ({
+          patient_id: { label: item.PatentID },
+          patient_name: { label: item.PatientName },
+          study_id: { label: item.StudyID },
+          study_uid: { label: item.StudyUID },
+          study_date: { label: item.StudyDate },
+          study_time: { label: item.StudyTime },
+          refering_phys: { label: item.ReferringPhys },
+        }));
+        setData(items);
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
   return (
     <Table arial-label="Default table">
       <TableHeader>
@@ -79,34 +77,14 @@ const StudiesTable = () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {items.map((item) => (
-          <TableRow key={item.file.label}>
-            <TableCell>
-              <TableCellLayout media={item.file.icon}>
-                {item.file.label}
-              </TableCellLayout>
-            </TableCell>
-            <TableCell>
-              <TableCellLayout
-                media={
-                  <Avatar
-                    aria-label={item.author.label}
-                    name={item.author.label}
-                    badge={{
-                      status: item.author.status as PresenceBadgeStatus,
-                    }}
-                  />
-                }
-              >
-                {item.author.label}
-              </TableCellLayout>
-            </TableCell>
-            <TableCell>{item.lastUpdated.label}</TableCell>
-            <TableCell>
-              <TableCellLayout media={item.lastUpdate.icon}>
-                {item.lastUpdate.label}
-              </TableCellLayout>
-            </TableCell>
+        {data.map((item) => (
+          <TableRow key={item.study_id.label}>
+            <TableCell>{item.study_id.label}</TableCell>
+            <TableCell>{item.patient_name.label}</TableCell>
+            <TableCell>{item.study_date.label}</TableCell>
+            <TableCell>{item.study_time.label}</TableCell>
+            <TableCell>{item.study_uid.label}</TableCell>
+            <TableCell>{item.refering_phys.label}</TableCell>
           </TableRow>
         ))}
       </TableBody>

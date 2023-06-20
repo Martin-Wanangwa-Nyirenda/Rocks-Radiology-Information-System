@@ -9,3 +9,14 @@ export type Patient = {
   sex: string;
   ID: any;
 };
+
+export type Study = {
+  StudyDate: string;
+  StudyTime: string;
+  StudyUID: string;
+  StudyID: string;
+  PatientName: string;
+  ReferringPhys: string;
+  StudyDescr: string;
+  PatientID: string; // Corrected property name
+};

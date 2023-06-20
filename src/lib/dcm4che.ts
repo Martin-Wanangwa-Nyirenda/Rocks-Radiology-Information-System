@@ -8,7 +8,7 @@ import {
   limit,
   getDocs,
 } from "firebase/firestore";
-import { Patient } from "./types";
+import { Patient, Study } from "./types";
 
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
@@ -122,6 +122,58 @@ export async function GetPatients(num?: Number): Promise<Patient[]> {
     });
 
     return patientsFetched;
+  } catch (error) {
+    console.error(error);
+    return []; // Return an empty array or handle the error according to your needs
+  }
+}
+
+export async function GetStudies(num?: number): Promise<Study[]> {
+  try {
+    const response = await fetch(
+      `http://${process.env.NEXT_PUBLIC_HOST}:8080/dcm4chee-arc/aets/DCM4CHEE/rs/studies`,
+      {
+        headers: {
+          Accept: "application/dicom+json", // Specify the desired content type here
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Request failed");
+    }
+
+    const data: any[] = await response.json(); // Expect an array of objects
+
+    const studies: Study[] = data.map((item: any) => {
+      const StudyDate = item["00080020"].Value[0];
+      const StudyTime = item["00080030"].Value[0];
+      const StudyUID = item["0020000D"].Value[0];
+      const StudyID = item["00200010"].Value[0];
+      const PatientName = item["00100010"].Value[0].Alphabetic.replace(
+        "^",
+        " "
+      );
+      const ReferringPhys = item["00080090"].Value[0].Alphabetic.replace(
+        "^",
+        " "
+      );
+      const StudyDescr = item["00080201"].Value?.[0];
+      const PatientID = item["00100020"].Value[0];
+
+      return {
+        StudyDate,
+        StudyTime,
+        StudyUID,
+        StudyID,
+        PatientName,
+        ReferringPhys,
+        StudyDescr,
+        PatientID, // Corrected property name
+      };
+    });
+
+    return studies;
   } catch (error) {
     console.error(error);
     return []; // Return an empty array or handle the error according to your needs
