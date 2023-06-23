@@ -9,26 +9,26 @@ import {
 import * as React from "react";
 import { TablistCompProps } from "@/lib/types";
 
-const useStyles = makeStyles({
-  root: {
-    alignItems: "flex-start",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "flex-start",
-    ...shorthands.padding("15px", "20px"),
-    rowGap: "20px",
-  },
-});
+// const useStyles = makeStyles({
+//   root: {
+//     alignItems: "flex-start",
+//     display: "flex",
+//     flexDirection: "column",
+//     justifyContent: "flex-start",
+//     ...shorthands.padding("5px", "20px"),
+//     rowGap: "10px",
+//   },
+// });
 
 const TabListComp = (props: TablistCompProps) => {
-  const styles = useStyles();
+  // const styles = useStyles();
 
   const onTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     props.currentTabHandler(data.value);
   };
 
   return (
-    <div className={styles.root}>
+    <div className="pb-2">
       <TabList onTabSelect={onTabSelect} defaultSelectedValue="0">
         <Tab value="0">Patients</Tab>
         <Tab value="1">Studies</Tab>

@@ -65,7 +65,7 @@ export default function CreatePatientForm() {
   return (
     <Dialog modalType="non-modal">
       <DialogTrigger disableButtonEnhancement>
-        <ToolbarButton>
+        <ToolbarButton appearance="primary">
           <PeopleAdd24Regular />
         </ToolbarButton>
       </DialogTrigger>

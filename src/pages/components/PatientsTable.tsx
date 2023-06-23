@@ -5,22 +5,11 @@ import {
   Table,
   TableHeader,
   TableHeaderCell,
-  TableCellLayout,
-  PresenceBadgeStatus,
-  Avatar,
 } from "@fluentui/react-components";
 import * as React from "react";
-import {
-  FolderRegular,
-  EditRegular,
-  OpenRegular,
-  DocumentRegular,
-  PeopleRegular,
-  DocumentPdfRegular,
-  VideoRegular,
-} from "@fluentui/react-icons";
 import { GetPatients } from "@/lib/dcm4che";
 import { Patient } from "@/lib/types";
+import { MenuToolBar } from "./Menubar";
 
 const columns = [
   { columnKey: "patientID", label: "Patient ID" },
@@ -60,28 +49,31 @@ const PatientsTable = () => {
     fetchPatients();
   }, []);
   return (
-    <Table arial-label="Default table">
-      <TableHeader>
-        <TableRow>
-          {columns.map((column) => (
-            <TableHeaderCell key={column.columnKey}>
-              {column.label}
-            </TableHeaderCell>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map((item) => (
-          <TableRow key={item.patient_id.label}>
-            <TableCell>{item.patient_id.label}</TableCell>
-            <TableCell>{item.patient_name.label}</TableCell>
-            <TableCell>{item.patient_sex.label}</TableCell>
-            <TableCell>{item.patient_dob.label}</TableCell>
-            <TableCell>{item.patient_imaging_day.label}</TableCell>
+    <>
+      <MenuToolBar />
+      <Table arial-label="Default table">
+        <TableHeader>
+          <TableRow>
+            {columns.map((column) => (
+              <TableHeaderCell key={column.columnKey}>
+                {column.label}
+              </TableHeaderCell>
+            ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {data.map((item) => (
+            <TableRow key={item.patient_id.label}>
+              <TableCell>{item.patient_id.label}</TableCell>
+              <TableCell>{item.patient_name.label}</TableCell>
+              <TableCell>{item.patient_sex.label}</TableCell>
+              <TableCell>{item.patient_dob.label}</TableCell>
+              <TableCell>{item.patient_imaging_day.label}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </>
   );
 };
 

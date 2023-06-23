@@ -14,16 +14,7 @@ import { Patient } from "@/lib/types";
 import CreatePatientForm from "./CreatePatientForm";
 
 export const MenuToolBar = (props: Partial<ToolbarProps>) => (
-  <Toolbar
-    {...props}
-    aria-label="Medium"
-    size="medium"
-    style={{
-      border: "2px solid black",
-      borderRadius: "8px",
-    }}
-  >
+  <Toolbar {...props} aria-label="Medium" size="medium">
     <CreatePatientForm />
-    <ToolbarButton aria-label="Reset Font Size" icon={<TextFont24Regular />} />
   </Toolbar>
 );
