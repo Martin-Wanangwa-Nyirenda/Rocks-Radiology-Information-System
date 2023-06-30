@@ -5,9 +5,18 @@ import {
   Table,
   TableHeader,
   TableHeaderCell,
+  Button,
+  TableCellLayout,
+  useArrowNavigationGroup,
+  useFocusableGroup,
 } from "@fluentui/react-components";
+import {
+  EditRegular,
+  CalendarMonthRegular,
+  DeleteRegular
+} from "@fluentui/react-icons";
 import * as React from "react";
-import { GetPatients } from "@/lib/dcm4che";
+import { GetPatients, GetPatientFromFirebase } from "@/lib/dcm4che";
 import { Patient } from "@/lib/types";
 import { MenuToolBar } from "./Menubar";
 
@@ -16,9 +25,15 @@ const columns = [
   { columnKey: "name", label: "Name" },
   { columnKey: "sex", label: "Sex" },
   { columnKey: "birthDate", label: "Birth Date" },
+  { columnKey: "imagingDay", label: "Imaging Day" },
 ];
 
 const PatientsTable = () => {
+
+  const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
+  const focusableGroupAttr = useFocusableGroup({
+    tabBehavior: "limited-trap-focus",
+  });
   const [data, setData] = React.useState<
     Array<{
       patient_id: { label: string };
@@ -32,12 +47,12 @@ const PatientsTable = () => {
   React.useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const patients = await GetPatients();
+        const patients = await GetPatientFromFirebase();
         const items = patients.map((item: Patient) => ({
           patient_id: { label: item.ID },
           patient_name: { label: item.name },
           patient_dob: { label: item.DOB },
-          patient_imaging_day: { label: item.imagingDay },
+          patient_imaging_day: { label: "12-01-2023"},
           patient_sex: { label: item.sex },
         }));
         setData(items);
@@ -69,6 +84,11 @@ const PatientsTable = () => {
               <TableCell>{item.patient_sex.label}</TableCell>
               <TableCell>{item.patient_dob.label}</TableCell>
               <TableCell>{item.patient_imaging_day.label}</TableCell>
+              <TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
+              <TableCellLayout>
+                <Button icon={<EditRegular />} aria-label="Edit" />
+              </TableCellLayout>
+            </TableCell>
             </TableRow>
           ))}
         </TableBody>

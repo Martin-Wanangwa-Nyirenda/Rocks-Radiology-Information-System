@@ -19,6 +19,7 @@ import { SelectGender } from "./CreatePatientFormComps/SelectGender";
 import { SelectBirthDate } from "./CreatePatientFormComps/SelectBirthDate";
 import { getLastPatientId, createPatient } from "@/lib/dcm4che";
 import { Patient } from "@/lib/types";
+import { Appointment } from "./CreatePatientFormComps/Appointment";
 
 const useStyles = makeStyles({
   content: {
@@ -33,6 +34,8 @@ export default function CreatePatientForm() {
   const [patientName, setPatientName] = React.useState("");
   const [patientSex, setPatientSex] = React.useState("");
   const [birthDate, setBirthDate] = React.useState("");
+  const [modality, setModality] = React.useState("");
+  const [imaging_day, setImaging_Day] = React.useState("");
 
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -43,12 +46,11 @@ export default function CreatePatientForm() {
       const patient: Patient = {
         name: patientName,
         DOB: birthDate,
-        imagingDay: "12-06-2023",
         sex: patientSex,
         ID: patient_id.toString(),
       };
 
-      const res = await createPatient(patient);
+      const res = await createPatient(patient, imaging_day, modality);
       console.log(res);
       alert(`Name: ${patientName} Sex: ${patientSex} DOB: ${birthDate}`);
     };
@@ -61,6 +63,12 @@ export default function CreatePatientForm() {
   }
   function handlerBirthDate(patient_dob: string) {
     setBirthDate(patient_dob);
+  }
+  function handlerModality(modality: string) {
+    setModality(modality);
+  }
+  function handlerImagingDate(imagingDate: string) {
+    setImaging_Day(imagingDate);
   }
   return (
     <Dialog modalType="non-modal">
@@ -87,6 +95,10 @@ export default function CreatePatientForm() {
               />
               <SelectGender handlerSetSex={handlerSetSex} />
               <SelectBirthDate handlerBirthDate={handlerBirthDate} />
+              <Label size="large" htmlFor={"appointments"}>
+                Appointments
+              </Label>
+              <Appointment handlerImagingDate={handlerImagingDate} handlerModality={handlerModality}/>
             </DialogContent>
             <DialogActions>
               <DialogTrigger disableButtonEnhancement>

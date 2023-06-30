@@ -5,7 +5,7 @@ export type TablistCompProps = {
 export type Patient = {
   name: string;
   DOB: string;
-  imagingDay: string;
+  appointment?: any;
   sex: string;
   ID: any;
 };

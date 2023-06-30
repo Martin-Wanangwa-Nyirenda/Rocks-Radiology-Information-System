@@ -7,8 +7,11 @@ import {
   orderBy,
   limit,
   getDocs,
+  DocumentReference
 } from "firebase/firestore";
+import { v4 } from 'uuid';
 import { Patient, Study } from "./types";
+import { dataGridBodyClassNames } from "@fluentui/react-components";
 
 async function postData(url = "", data = {}) {
   const response = await fetch(url, {
@@ -21,7 +24,9 @@ async function postData(url = "", data = {}) {
   return response.json();
 }
 
-export async function createPatient(patient: Patient) {
+export async function createPatient(patient: Patient, appointment?: string, modality?: string) {
+  const appointment_ = appointment ?? " "; 
+  const modality_ = modality ?? " ";
   let final = "Nothing happened";
   const name = patient.name.replace(" ", "^");
   const patientDICOMObj = {
@@ -52,13 +57,20 @@ export async function createPatient(patient: Patient) {
     patientDICOMObj
   )
     .then(async () => {
+      if(appointment_ && modality_){
+      const appointmentRef = await createAppointment(appointment_, modality_)
+
       await setDoc(doc(db, "patients", patient.ID), {
         name: patient.name,
         DOB: patient.DOB,
-        imagingDay: patient.imagingDay,
+        appointment: appointmentRef,
         createdAt: Date.now().toLocaleString(),
         sex: patient.sex,
       }).then(() => (final = "success"));
+    }else{
+      throw new Error("Appointment and Modality not defined")
+    }
+
     })
     .catch((error) => {
       console.error(error);
@@ -66,6 +78,16 @@ export async function createPatient(patient: Patient) {
     });
 
   return final;
+}
+
+export async function createAppointment(date: string, modality: string): Promise<DocumentReference>{
+  const id = v4()
+  const appointmentRef = doc(db, "appointments", id);
+  await setDoc(appointmentRef, {
+   imagingDay: date,
+   modality: modality
+  })
+  return appointmentRef;
 }
 
 export async function getLastPatientId(
@@ -177,5 +199,40 @@ export async function GetStudies(num?: number): Promise<Study[]> {
   } catch (error) {
     console.error(error);
     return []; // Return an empty array or handle the error according to your needs
+  }
+}
+
+export async function GetPatientFromFirebase(num?: number) {
+  try {
+    const collectionRef = collection(db, 'patients');
+    const querySnapshot = await getDocs(collectionRef);
+
+    const data: { name: string; DOB: string; sex: string; ID: string, imagingDay: string }[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const patient = doc.data();
+      const patientWithID = {
+        name: patient.name,
+        DOB: patient.DOB,
+        sex: patient.sex,
+        ID: doc.id,
+        imagingDay: patient.imagingDay
+      };
+      data.push(patientWithID);
+    });
+
+    const filteredData = data.map((patient) => ({
+      name: patient.name,
+      DOB: patient.DOB,
+      sex: patient.sex,
+      ID: patient.ID,
+      imagingDay: patient.imagingDay
+    }));
+
+    return filteredData;
+  } catch (error) {
+    // Handle the error appropriately
+    console.error('Error getting patient data:', error);
+    throw error;
   }
 }
