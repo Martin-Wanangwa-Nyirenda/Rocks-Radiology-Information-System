@@ -7,6 +7,7 @@ import {
   orderBy,
   limit,
   getDocs,
+  getDoc,
   DocumentReference
 } from "firebase/firestore";
 import { v4 } from 'uuid';
@@ -27,7 +28,7 @@ async function postData(url = "", data = {}) {
 export async function createPatient(patient: Patient, appointment?: string, modality?: string) {
   const appointment_ = appointment ?? " "; 
   const modality_ = modality ?? " ";
-  let final = "Nothing happened";
+  let final = "Operation wasn't successfully";
   const name = patient.name.replace(" ", "^");
   const patientDICOMObj = {
     "00100010": {
@@ -234,5 +235,16 @@ export async function GetPatientFromFirebase(num?: number) {
     // Handle the error appropriately
     console.error('Error getting patient data:', error);
     throw error;
+  }
+}
+
+export async function GetPatientByID(id: string){
+  const docRef = doc(db, "patients", id);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } else {
+    throw new Error("Patient does not exist.")
   }
 }

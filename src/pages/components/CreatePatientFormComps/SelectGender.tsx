@@ -21,6 +21,7 @@ const useStyles = makeStyles({
 
 type SelectGenderProps = {
   handlerSetSex: (sex: string) => void;
+  value?: string;
 };
 
 export const SelectGender = (props: SelectGenderProps) => {
@@ -38,6 +39,7 @@ export const SelectGender = (props: SelectGenderProps) => {
         placeholder="Select an gender"
         {...props}
         onOptionSelect={handleOptionSelect}
+        defaultValue={props.value}
       >
         {options.map((option) => (
           <Option key={option} disabled={option === "Ferret"}>

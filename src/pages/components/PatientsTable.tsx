@@ -13,12 +13,13 @@ import {
 import {
   EditRegular,
   CalendarMonthRegular,
-  DeleteRegular
+  DeleteRegular,
 } from "@fluentui/react-icons";
 import * as React from "react";
 import { GetPatients, GetPatientFromFirebase } from "@/lib/dcm4che";
 import { Patient } from "@/lib/types";
 import { MenuToolBar } from "./Menubar";
+import PatientDetails from "./PatientDetails";
 
 const columns = [
   { columnKey: "patientID", label: "Patient ID" },
@@ -29,7 +30,6 @@ const columns = [
 ];
 
 const PatientsTable = () => {
-
   const keyboardNavAttr = useArrowNavigationGroup({ axis: "grid" });
   const focusableGroupAttr = useFocusableGroup({
     tabBehavior: "limited-trap-focus",
@@ -52,7 +52,7 @@ const PatientsTable = () => {
           patient_id: { label: item.ID },
           patient_name: { label: item.name },
           patient_dob: { label: item.DOB },
-          patient_imaging_day: { label: "12-01-2023"},
+          patient_imaging_day: { label: "12-01-2023" },
           patient_sex: { label: item.sex },
         }));
         setData(items);
@@ -85,10 +85,10 @@ const PatientsTable = () => {
               <TableCell>{item.patient_dob.label}</TableCell>
               <TableCell>{item.patient_imaging_day.label}</TableCell>
               <TableCell role="gridcell" tabIndex={0} {...focusableGroupAttr}>
-              <TableCellLayout>
-                <Button icon={<EditRegular />} aria-label="Edit" />
-              </TableCellLayout>
-            </TableCell>
+                <TableCellLayout>
+                  <PatientDetails patientID={item.patient_id.label} />
+                </TableCellLayout>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

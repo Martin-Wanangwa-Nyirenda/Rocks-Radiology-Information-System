@@ -10,6 +10,7 @@ const useStyles = makeStyles({
 
 type SelectBirthDateProps = {
   handlerBirthDate: (patient_dob: string) => void;
+  dateValue?: Date;
 };
 
 export const SelectBirthDate = (props: SelectBirthDateProps) => {
@@ -25,6 +26,7 @@ export const SelectBirthDate = (props: SelectBirthDateProps) => {
           let mydate = `${date?.getDay()}-${date?.getMonth()}-${date?.getFullYear()}`;
           props.handlerBirthDate(mydate || Date.now.toString());
         }}
+        value={props.dateValue}
       />
     </Field>
   );
