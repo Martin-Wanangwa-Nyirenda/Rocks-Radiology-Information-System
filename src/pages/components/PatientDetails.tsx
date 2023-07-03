@@ -64,8 +64,7 @@ export default function PatientDetails(props: PatientDetailsProps) {
         ID: props.patientID,
       };
 
-      const res = await createPatient(patient, imaging_day, modality);
-      console.log(res);
+      await createPatient(patient, imaging_day, modality);
       alert(`Name: ${patientName} Sex: ${patientSex} DOB: ${birthDate}`);
     };
 
@@ -116,6 +115,16 @@ export default function PatientDetails(props: PatientDetailsProps) {
     }
   }, [patientDataReady]);
 
+  React.useEffect(() => {
+    if (fetchedPatientData !== undefined || appointment !== undefined) {
+      setPatientName(fetchedPatientData.name);
+      setPatientSex(fetchedPatientData.sex);
+      setBirthDate(fetchedPatientData.DOB);
+      setModality(appointment.modality);
+      setImaging_Day(appointment.imagingDay);
+    }
+  }, [appointment]);
+
   const parseDate = (dateString: string): Date => {
     const parsedDate = parse(dateString, "d-M-yyyy", new Date());
     return parsedDate;
@@ -136,19 +145,16 @@ export default function PatientDetails(props: PatientDetailsProps) {
               <Input
                 required
                 type="text"
-                value={fetchedPatientData.name}
+                value={patientName}
                 id={"name-input"}
                 onChange={(e) => {
                   setPatientName(e.target.value);
                 }}
               />
-              <SelectGender
-                handlerSetSex={handlerSetSex}
-                value={fetchedPatientData.sex}
-              />
+              <SelectGender handlerSetSex={handlerSetSex} value={patientSex} />
               <SelectBirthDate
                 handlerBirthDate={handlerBirthDate}
-                dateValue={parseDate(fetchedPatientData.DOB)}
+                dateValue={parseDate(birthDate)}
               />
               <Label size="large" htmlFor={"appointments"}>
                 Appointments
@@ -156,8 +162,8 @@ export default function PatientDetails(props: PatientDetailsProps) {
               <Appointment
                 handlerImagingDate={handlerImagingDate}
                 handlerModality={handlerModality}
-                imagingDateValue={parseDate(appointment.imagingDay)}
-                modalityValue={appointment.modality}
+                imagingDateValue={parseDate(imaging_day)}
+                modalityValue={modality}
               />
             </DialogContent>
             <DialogActions>

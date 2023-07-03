@@ -32,7 +32,6 @@ export async function createPatient(
 ) {
   const appointment_ = appointment ?? " ";
   const modality_ = modality ?? " ";
-  let final = "Operation wasn't successfully";
   const name = patient.name.replace(" ", "^");
   const patientDICOMObj = {
     "00100010": {
@@ -75,17 +74,14 @@ export async function createPatient(
             sex: patient.sex,
           },
           { merge: true }
-        ).then(() => (final = "success"));
+        );
       } else {
         throw new Error("Appointment and Modality not defined");
       }
     })
     .catch((error) => {
       console.error(error);
-      final = "failed";
     });
-
-  return final;
 }
 
 export async function createAppointment(
