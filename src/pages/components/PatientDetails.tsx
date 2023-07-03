@@ -20,6 +20,7 @@ import { SelectBirthDate } from "./CreatePatientFormComps/SelectBirthDate";
 import { getLastPatientId, createPatient, GetPatientByID } from "@/lib/dcm4che";
 import { Patient } from "@/lib/types";
 import { Appointment } from "./CreatePatientFormComps/Appointment";
+import { parse, format } from "date-fns";
 import {
   DocumentData,
   DocumentReference,
@@ -45,7 +46,7 @@ export default function PatientDetails(props: PatientDetailsProps) {
   const [birthDate, setBirthDate] = React.useState("");
   const [modality, setModality] = React.useState("");
   const [imaging_day, setImaging_Day] = React.useState("");
-
+  const [patientDataReady, setPatientDataReady] = React.useState(false);
   const [fetchedPatientData, setFetchedPatientData] =
     React.useState<DocumentData>({});
   const [appointment, setAppointment] = React.useState<
@@ -56,13 +57,11 @@ export default function PatientDetails(props: PatientDetailsProps) {
     ev.preventDefault();
 
     const processFormSubmission = async () => {
-      const patient_id = await getLastPatientId("patients");
-
       const patient: Patient = {
         name: patientName,
         DOB: birthDate,
         sex: patientSex,
-        ID: patient_id.toString(),
+        ID: props.patientID,
       };
 
       const res = await createPatient(patient, imaging_day, modality);
@@ -88,6 +87,7 @@ export default function PatientDetails(props: PatientDetailsProps) {
   async function fetchData() {
     const data = await GetPatientByID(props.patientID);
     setFetchedPatientData(data);
+    setPatientDataReady(true);
   }
 
   async function fetchAppointment(docRef: DocumentReference) {
@@ -110,11 +110,16 @@ export default function PatientDetails(props: PatientDetailsProps) {
   }, []);
 
   React.useEffect(() => {
-    if (fetchedPatientData.Appointment != undefined) {
-      fetchAppointment(fetchedPatientData.Appointment);
+    if (patientDataReady === true) {
+      console.log("The data: " + fetchedPatientData.appointment);
+      fetchAppointment(fetchedPatientData.appointment);
     }
-  }, [fetchedPatientData]);
+  }, [patientDataReady]);
 
+  const parseDate = (dateString: string): Date => {
+    const parsedDate = parse(dateString, "d-M-yyyy", new Date());
+    return parsedDate;
+  };
   return (
     <Dialog modalType="non-modal">
       <DialogTrigger disableButtonEnhancement>
@@ -123,7 +128,7 @@ export default function PatientDetails(props: PatientDetailsProps) {
       <DialogSurface aria-describedby={undefined}>
         <form onSubmit={handleSubmit}>
           <DialogBody>
-            <DialogTitle>Create New Patient</DialogTitle>
+            <DialogTitle>Patient {props.patientID}</DialogTitle>
             <DialogContent className={styles.content}>
               <Label required htmlFor={"name-input"}>
                 Full Name
@@ -143,7 +148,7 @@ export default function PatientDetails(props: PatientDetailsProps) {
               />
               <SelectBirthDate
                 handlerBirthDate={handlerBirthDate}
-                dateValue={new Date(Date.parse(fetchedPatientData.sex))}
+                dateValue={parseDate(fetchedPatientData.DOB)}
               />
               <Label size="large" htmlFor={"appointments"}>
                 Appointments
@@ -151,7 +156,7 @@ export default function PatientDetails(props: PatientDetailsProps) {
               <Appointment
                 handlerImagingDate={handlerImagingDate}
                 handlerModality={handlerModality}
-                imagingDateValue={new Date(Date.parse(appointment.imagingDay))}
+                imagingDateValue={parseDate(appointment.imagingDay)}
                 modalityValue={appointment.modality}
               />
             </DialogContent>

@@ -8,9 +8,9 @@ import {
   limit,
   getDocs,
   getDoc,
-  DocumentReference
+  DocumentReference,
 } from "firebase/firestore";
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 import { Patient, Study } from "./types";
 import { dataGridBodyClassNames } from "@fluentui/react-components";
 
@@ -25,8 +25,12 @@ async function postData(url = "", data = {}) {
   return response.json();
 }
 
-export async function createPatient(patient: Patient, appointment?: string, modality?: string) {
-  const appointment_ = appointment ?? " "; 
+export async function createPatient(
+  patient: Patient,
+  appointment?: string,
+  modality?: string
+) {
+  const appointment_ = appointment ?? " ";
   const modality_ = modality ?? " ";
   let final = "Operation wasn't successfully";
   const name = patient.name.replace(" ", "^");
@@ -58,20 +62,23 @@ export async function createPatient(patient: Patient, appointment?: string, moda
     patientDICOMObj
   )
     .then(async () => {
-      if(appointment_ && modality_){
-      const appointmentRef = await createAppointment(appointment_, modality_)
+      if (appointment_ && modality_) {
+        const appointmentRef = await createAppointment(appointment_, modality_);
 
-      await setDoc(doc(db, "patients", patient.ID), {
-        name: patient.name,
-        DOB: patient.DOB,
-        appointment: appointmentRef,
-        createdAt: Date.now().toLocaleString(),
-        sex: patient.sex,
-      }).then(() => (final = "success"));
-    }else{
-      throw new Error("Appointment and Modality not defined")
-    }
-
+        await setDoc(
+          doc(db, "patients", patient.ID),
+          {
+            name: patient.name,
+            DOB: patient.DOB,
+            appointment: appointmentRef,
+            createdAt: Date.now().toLocaleString(),
+            sex: patient.sex,
+          },
+          { merge: true }
+        ).then(() => (final = "success"));
+      } else {
+        throw new Error("Appointment and Modality not defined");
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -81,13 +88,16 @@ export async function createPatient(patient: Patient, appointment?: string, moda
   return final;
 }
 
-export async function createAppointment(date: string, modality: string): Promise<DocumentReference>{
-  const id = v4()
+export async function createAppointment(
+  date: string,
+  modality: string
+): Promise<DocumentReference> {
+  const id = v4();
   const appointmentRef = doc(db, "appointments", id);
   await setDoc(appointmentRef, {
-   imagingDay: date,
-   modality: modality
-  })
+    imagingDay: date,
+    modality: modality,
+  });
   return appointmentRef;
 }
 
@@ -205,10 +215,16 @@ export async function GetStudies(num?: number): Promise<Study[]> {
 
 export async function GetPatientFromFirebase(num?: number) {
   try {
-    const collectionRef = collection(db, 'patients');
+    const collectionRef = collection(db, "patients");
     const querySnapshot = await getDocs(collectionRef);
 
-    const data: { name: string; DOB: string; sex: string; ID: string, imagingDay: string }[] = [];
+    const data: {
+      name: string;
+      DOB: string;
+      sex: string;
+      ID: string;
+      imagingDay: string;
+    }[] = [];
 
     querySnapshot.forEach((doc) => {
       const patient = doc.data();
@@ -217,7 +233,7 @@ export async function GetPatientFromFirebase(num?: number) {
         DOB: patient.DOB,
         sex: patient.sex,
         ID: doc.id,
-        imagingDay: patient.imagingDay
+        imagingDay: patient.imagingDay,
       };
       data.push(patientWithID);
     });
@@ -227,24 +243,26 @@ export async function GetPatientFromFirebase(num?: number) {
       DOB: patient.DOB,
       sex: patient.sex,
       ID: patient.ID,
-      imagingDay: patient.imagingDay
+      imagingDay: patient.imagingDay,
     }));
 
     return filteredData;
   } catch (error) {
     // Handle the error appropriately
-    console.error('Error getting patient data:', error);
+    console.error("Error getting patient data:", error);
     throw error;
   }
 }
 
-export async function GetPatientByID(id: string){
+export async function GetPatientByID(id: string) {
   const docRef = doc(db, "patients", id);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
     return docSnap.data();
   } else {
-    throw new Error("Patient does not exist.")
+    throw new Error("Patient does not exist.");
   }
 }
+
+export async function updatePatientDetails() {}
